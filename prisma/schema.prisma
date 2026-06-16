@@ -1,0 +1,30 @@
+// Prisma schema for Cricket Tournament & Community Management Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model - represents a user in the platform
+model User {
+  // UUID primary key, auto-generated
+  id String @id @default(uuid())
+
+  // User's full name
+  name String
+
+  // User's email - must be unique across the system
+  email String @unique
+
+  // Timestamp when the user was created - automatically set to current time
+  createdAt DateTime @default(now())
+
+  // Timestamp of the last update - automatically updated by Prisma on every change
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
