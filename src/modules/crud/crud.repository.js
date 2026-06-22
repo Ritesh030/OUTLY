@@ -11,27 +11,27 @@ class CrudRepository {
                   return response
             } catch (error) {
                   if(error instanceof AppError) throw error
-                  throw new buildAppError(error, {service:crud-repository, controller:create})
+                  throw buildAppError(error, {service:'crud-repository', controller:'create'})
             }
       }
 
-      async get(id) {
+      async getById(id) {
             try {
                   const response = await this.model.findByPk(id)
                   return response
             } catch (error) {
                   if(error instanceof AppError) throw error
-                  throw new buildAppError(error, {service:crud-repository, controller:get})
+                  throw buildAppError(error, {service:'crud-repository', controller:'get'})
             }
       }
 
       async getAll() {
             try {
-                  const response = await this.model.findall()
+                  const response = await this.model.findAll()
                   return response
             } catch (error) {
                   if(error instanceof AppError) throw error
-                  throw new buildAppError(error, {service:crud-repository, controller:getAll})
+                  throw buildAppError(error, {service:'crud-repository', controller:'getAll'})
             }
       }
 
@@ -45,7 +45,7 @@ class CrudRepository {
                   return response > 0
             } catch (error) {
                   if(error instanceof AppError) throw error
-                  throw new buildAppError(error, {service:crud-repository, controller:update})
+                  throw buildAppError(error, {service:'crud-repository', controller:'update'})
             }
       }
 
@@ -60,7 +60,7 @@ class CrudRepository {
                   return response > 0
             } catch (error) {
                   if(error instanceof AppError) throw error
-                  throw new buildAppError(error, {service:crud-repository, controller:update})
+                  throw buildAppError(error, {service:'crud-repository', controller:'update'})
             }
       }
 }

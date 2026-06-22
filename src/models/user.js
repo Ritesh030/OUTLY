@@ -1,4 +1,7 @@
 'use strict';
+
+const bcrypt = require('bcrypt')
+
 const {
   Model
 } = require('sequelize');
@@ -11,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.City, {
-        foreignKey:cityId,
+        foreignKey:'cityId',
         as:'city' // Alias to use when fetching data (e.g., user.city)
       })
     }
@@ -32,10 +35,22 @@ module.exports = (sequelize, DataTypes) => {
     cityId: {
       type:DataTypes.INTEGER,
       allowNull:true
+    },
+    refreshToken: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     sequelize,
     modelName: 'User',
+    hooks: {
+      beforeCreate: async (user, options) => {
+        if (user.password) {
+          const salt = await bcrypt.genSalt(10);
+          user.password = await bcrypt.hash(user.password, salt);
+        }
+      }
+    }
   });
   return User;
 };

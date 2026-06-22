@@ -1,3 +1,5 @@
+const { AppError, buildAppError } = require("../../utils")
+
 class CrudService {
       constructor(repository) {
             this.repository = repository
@@ -9,17 +11,17 @@ class CrudService {
                   return response
             } catch (error) {
                   if(error instanceof AppError) throw error
-                  throw new buildAppError(error, {service:crud-service, controller:create})
+                  throw buildAppError(error, {service:'crud-service', controller:'create'})
             }
       }
 
-      async get(id) {
+      async getById(id) {
             try {
                   const response = await this.repository.get(id)
                   return response
             } catch (error) {
                   if(error instanceof AppError) throw error
-                  throw new buildAppError(error, {service:crud-service, controller:get})
+                  throw buildAppError(error, {service:'crud-service', controller:'get'})
             }
       }
 
@@ -29,7 +31,7 @@ class CrudService {
                   return response
             } catch (error) {
                   if(error instanceof AppError) throw error
-                  throw new buildAppError(error, {service:crud-service, controller:getall})
+                  throw buildAppError(error, {service:'crud-service', controller:'getall'})
             }
       }
 
@@ -39,7 +41,7 @@ class CrudService {
                   return response
             } catch (error) {
                   if(error instanceof AppError) throw error
-                  throw new buildAppError(error, {service:crud-service, controller:update})
+                  throw buildAppError(error, {service:'crud-service', controller:'update'})
             }
       }
 
@@ -49,7 +51,7 @@ class CrudService {
                   return response
             } catch (error) {
                   if(error instanceof AppError) throw error
-                  throw new buildAppError(error, {service:crud-service, controller:destroy})
+                  throw buildAppError(error, {service:'crud-service', controller:'destroy'})
             }
       }
 }
