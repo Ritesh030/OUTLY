@@ -17,6 +17,18 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey:'cityId',
         as:'city' // Alias to use when fetching data (e.g., user.city)
       })
+
+      this.belongsToMany(models.Team, {
+        through: 'UserTeam',
+        foreignKey: 'userId',
+        otherKey: 'teamId',
+        as: 'teams'
+      })
+
+      this.hasMany(models.Team, {
+        foreignKey: 'ownerId',
+        as: 'ownedTeams'
+      })
     }
   }
   User.init({
@@ -38,6 +50,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     refreshToken: {
       type: DataTypes.STRING,
+      allowNull: true
+    },
+    role: {
+      type: DataTypes.ENUM('PLAYER', 'ORGANIZER', 'ADMIN'),
+      defaultValue: 'PLAYER',
       allowNull: true
     }
   }, {
