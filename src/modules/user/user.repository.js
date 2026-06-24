@@ -25,7 +25,7 @@ class UserRepository extends CrudRepository {
                   return user
             } catch (error) {
                   if (error instanceof AppError) throw error
-                  throw buildAppError(error, { service: crud - repository, controller: update })
+                  throw buildAppError(error, { service: 'user - repository', controller: 'update' })
             }
       }
 

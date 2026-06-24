@@ -17,6 +17,34 @@ const create = async (req, res, next) => {
       }
 }
 
+const addPlayer = async (req, res, next) => {
+      try {
+            const {teamId, playerId} = req.body
+            const userId = req.user.id
+
+            const response = await teamService.addPlayer({userId, teamId, playerId})
+
+            return sendSuccessResponse(res, StatusCodes.CREATED, "Player added", response)
+      } catch (error) {
+            next(error)
+      }
+}
+
+const removePlayer = async (req, res, next) => {
+      try {
+            const {teamId, playerId} = req.body
+            const userId = req.user.id
+
+            const response = await teamService.removerPlayer({userId, teamId, playerId})
+
+            return sendSuccessResponse(res, StatusCodes.OK, "Player Deleted", response)
+      } catch (error) {
+            next(error)
+      }
+}
+
 module.exports = {
-      create
+      create,
+      addPlayer,
+      removePlayer
 }

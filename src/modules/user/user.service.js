@@ -24,33 +24,38 @@ class UserService extends CrudService {
       }
 
       async login({ email, password }) {
-            const user = await this.repository.getByEmail(email);
-
-            if (!user) {
-                  throw new AppError("login error", "User not found at user service", "Invalid email or password", StatusCodes.UNAUTHORIZED);
+            try {
+                  const user = await this.repository.getByEmail(email);
+      
+                  if (!user) {
+                        throw new AppError("login error", "User not found at user service", "Invalid email or password", StatusCodes.UNAUTHORIZED);
+                  }
+      
+                  const isPasswordCorrect = await verifyUserPassword(password, user.password);
+      
+                  if (!isPasswordCorrect) {
+                        throw new AppError("login error", "Password mismatch at user service", "Invalid email or password", StatusCodes.UNAUTHORIZED);
+                  }
+      
+                  const tokenPayload = { id: user.id, email: user.email };
+                  const accessToken = generateAccessToken(tokenPayload);
+                  const refreshToken = generateRefreshToken(tokenPayload);
+      
+                  const isUpdated = await this.repository.update(user.id, { refreshToken });
+      
+                  if (!isUpdated) {
+                        console.log(`cannot set the refresh token for the user with id: ${user.id}`);
+                        throw new AppError("DatabaseError", "Token update failed", "Could not secure your login session", StatusCodes.INTERNAL_SERVER_ERROR);
+                  }
+      
+                  const sanitizedUser = user.toJSON ? user.toJSON() : { ...user };
+                  delete sanitizedUser.password;
+      
+                  return { user: sanitizedUser, accessToken, refreshToken };
+            } catch (error) {
+                  if (error instanceof AppError) throw error
+                  throw buildAppError(error, { service: 'user - service', controller: 'login' })
             }
-
-            const isPasswordCorrect = await verifyUserPassword(password, user.password);
-
-            if (!isPasswordCorrect) {
-                  throw new AppError("login error", "Password mismatch at user service", "Invalid email or password", StatusCodes.UNAUTHORIZED);
-            }
-
-            const tokenPayload = { id: user.id, email: user.email };
-            const accessToken = generateAccessToken(tokenPayload);
-            const refreshToken = generateRefreshToken(tokenPayload);
-
-            const isUpdated = await this.repository.update(user.id, { refreshToken });
-
-            if (!isUpdated) {
-                  console.log(`cannot set the refresh token for the user with id: ${user.id}`);
-                  throw new AppError("DatabaseError", "Token update failed", "Could not secure your login session", StatusCodes.INTERNAL_SERVER_ERROR);
-            }
-
-            const sanitizedUser = user.toJSON ? user.toJSON() : { ...user };
-            delete sanitizedUser.password;
-
-            return { user: sanitizedUser, accessToken, refreshToken };
       }
 }
 
