@@ -7,7 +7,7 @@ const userService = new UserService()
 const cookieOptions = {
       httpOnly: true,     // Protects against XSS attacks
       sameSite: 'strict', // Protects against CSRF attacks
-      secure: true
+      // secure: true // false for testing
 }
 
 const create = async (req, res, next) => {
