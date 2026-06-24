@@ -34,6 +34,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: true,
       require: true
+    },
+    role: {
+      type: DataTypes.ENUM('CAPTAIN', 'VICE_CAPTAIN', 'PLAYER'),
+      defaultValue: 'PLAYER',
+      allowNull: true
     }
   }, {
     sequelize,

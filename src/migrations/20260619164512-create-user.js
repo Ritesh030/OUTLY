@@ -15,26 +15,31 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING,
-        allowNull:false,
-        unique:true
+        allowNull: false,
+        unique: true
       },
       password: {
         type: Sequelize.STRING,
-        allowNull:false,
+        allowNull: false,
       },
       cityId: {
         type: Sequelize.INTEGER,
         references: {
-          model:'Cities',
-          key:'id',
+          model: 'Cities',
+          key: 'id',
         },
-        allowNull:true,
+        allowNull: true,
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL'
       },
       refreshToken: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
+      },
+      role: {
+        type: Sequelize.ENUM('USER', 'ORGANIZER', 'ADMIN'),
+        defaultValue: 'USER',
+        allowNull: true
       },
       createdAt: {
         allowNull: false,

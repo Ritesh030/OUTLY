@@ -18,6 +18,11 @@ module.exports = {
         allowNull: true,
         require: true
       },
+      role: {
+        type: Sequelize.ENUM('CAPTAIN', 'VICE_CAPTAIN', 'PLAYER'),
+        defaultValue: 'PLAYER',
+        allowNull: true
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
