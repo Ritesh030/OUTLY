@@ -15,7 +15,9 @@ const create = async (req, res, next) => {
             const data = req.body
             const response = await userService.create(data)
 
-            return sendSuccessResponse(res, StatusCodes.CREATED, "User created", response)
+            const cleanResponse = {role: response.role, name: response.name, id: response.id, email: response.email }
+
+            return sendSuccessResponse(res, StatusCodes.CREATED, "User created", cleanResponse)
       } catch (error) {
             next(error)
       }

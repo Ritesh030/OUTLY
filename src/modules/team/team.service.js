@@ -30,9 +30,9 @@ class TeamService extends CrudService {
             }
       }
 
-      async assignCaptain({ userId, teamId, newCaptainId }) {
+      async assignCaptain({ userId, teamId, captainId }) {
             try {
-                  const response = this.repository.assignCaptain({ userId, teamId, newCaptainId})
+                  const response = this.repository.assignCaptain({ userId, teamId, captainId})
                   return response
             } catch (error) {
                   if(error instanceof AppError) throw error

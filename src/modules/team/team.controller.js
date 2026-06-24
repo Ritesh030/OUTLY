@@ -45,10 +45,12 @@ const removePlayer = async (req, res, next) => {
 
 const assignCaptain = async (req, res, next) => {
       try {
-            const { teamId, newCaptainId} = req.body
+            const { teamId, captainId} = req.body
             const userId = req.user.id
 
-            const response = await teamService.assignCaptain({userId, teamId, newCaptainId})
+            const response = await teamService.assignCaptain({userId, teamId, captainId})
+
+            return sendSuccessResponse(res, StatusCodes.OK, "Captain assigned", response)
       } catch (error) {
             next(error)
       }

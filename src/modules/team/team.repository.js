@@ -72,7 +72,7 @@ class TeamRepository extends CrudRepository {
             }
       }
 
-      async assignCaptain({ userId, teamId, newCaptainId }) {
+      async assignCaptain({ userId, teamId, captainId }) {
             try {
                   const team = await super.getById(teamId)
 
@@ -94,7 +94,7 @@ class TeamRepository extends CrudRepository {
                   const [updatedRows] = await UserTeam.update(
                         { role: 'CAPTAIN' },
                         {
-                              where: { teamId: teamId, userId: newCaptainId }
+                              where: { teamId: teamId, userId: captainId }
                         }
                   )
 
