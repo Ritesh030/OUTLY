@@ -57,5 +57,6 @@ const assignCaptain = async (req, res, next) => {
 module.exports = {
       create,
       addPlayer,
-      removePlayer
+      removePlayer,
+      assignCaptain
 }
