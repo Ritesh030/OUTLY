@@ -43,6 +43,17 @@ const removePlayer = async (req, res, next) => {
       }
 }
 
+const assignCaptain = async (req, res, next) => {
+      try {
+            const { teamId, newCaptainId} = req.body
+            const userId = req.user.id
+
+            const response = await teamService.assignCaptain({userId, teamId, newCaptainId})
+      } catch (error) {
+            next(error)
+      }
+}
+
 module.exports = {
       create,
       addPlayer,

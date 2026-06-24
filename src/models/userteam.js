@@ -33,6 +33,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
+    },
+    role: {
+      type: DataTypes.ENUM('CAPTAIN', 'VICE_CAPTAIN', 'PLAYER'),
+      defaultValue: 'PLAYER',
+      allowNull: true
     }
   }, {
     sequelize,

@@ -29,6 +29,16 @@ class TeamService extends CrudService {
                   throw buildAppError(error, {service: 'team - service', controller: 'removePlayer'})
             }
       }
+
+      async assignCaptain({ userId, teamId, newCaptainId }) {
+            try {
+                  const response = this.repository.assignCaptain({ userId, teamId, newCaptainId})
+                  return response
+            } catch (error) {
+                  if(error instanceof AppError) throw error
+                  throw buildAppError(error, {service: 'team - service', controller: 'assignCaptain'})
+            }
+      }
 }
 
 module.exports = TeamService
