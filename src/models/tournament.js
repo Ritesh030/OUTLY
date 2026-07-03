@@ -41,13 +41,18 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 'ROUND-ROBIN'
     },
     status:{
-      type: DataTypes.ENUM('DRAFT', 'OPEN', 'REGISTRATION-CLOSED', 'ONGOING', 'COMPLETED', 'CANCELLED'),
-      defaultValue: 'DRAFT'
-
+      type: DataTypes.ENUM('OPEN', 'REGISTRATION-CLOSED', 'ONGOING', 'COMPLETED', 'CANCELLED'),
+      defaultValue: 'OPEN'
     },
-    max_teams: {
+    maxTeams: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        min: {
+          args: [2],
+          msg: "A tournament must allow minimum 2 teams"
+        }
+      }
     },
     registrationDeadline: {
       type: DataTypes.DATE,

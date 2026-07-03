@@ -23,10 +23,10 @@ module.exports = {
         defaultValue: 'ROUND-ROBIN'
       },
       status: {
-        type: Sequelize.ENUM('DRAFT', 'OPEN', 'REGISTRATION-CLOSED', 'ONGOING', 'COMPLETED', 'CANCELLED'),
-        defaultValue: 'DRAFT'
+        type: Sequelize.ENUM('OPEN', 'REGISTRATION-CLOSED', 'ONGOING', 'COMPLETED', 'CANCELLED'),
+        defaultValue: 'OPEN'
       },
-      max_teams: {
+      maxTeams: {
         type: Sequelize.INTEGER,
         allowNull: false
       },
@@ -34,7 +34,7 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW() + INTERVAL '5 days'")
       },
-      statDate: {
+      startDate: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW() + INTERVAL '6 days'")
       },
@@ -53,6 +53,17 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
+
+    await queryInterface.addConstraint('Tournaments', {
+      type: 'check',
+      fields: ['maxTeams'],
+      where: {
+        maxTeams: {
+          [Sequelize.Op.gte]: 2
+        }
+      },
+      name: "Tournaments minimum number of teams"
+    })
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Tournaments');

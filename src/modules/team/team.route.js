@@ -1,6 +1,6 @@
 const express = require('express')
 const { create, addPlayer, removePlayer, assignCaptain } = require('./team.controller')
-const { validateUserJWT } = require('../../middleware/user.validate')
+const { validateUserJWT } = require('../../middleware/user/user.validate')
 
 const teamRouter = express.Router()
 

@@ -37,7 +37,7 @@ class UserService extends CrudService {
                         throw new AppError("login error", "Password mismatch at user service", "Invalid email or password", StatusCodes.UNAUTHORIZED);
                   }
       
-                  const tokenPayload = { id: user.id, email: user.email };
+                  const tokenPayload = { id: user.id, email: user.email , role: user.role};
                   const accessToken = generateAccessToken(tokenPayload);
                   const refreshToken = generateRefreshToken(tokenPayload);
       
