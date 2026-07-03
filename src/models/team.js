@@ -19,6 +19,13 @@ module.exports = (sequelize, DataTypes) => {
         as: 'member' // Allows you to run team.getMembers()
       })
 
+      this.belongsToMany(models.Tournament, {
+        through: 'TournamentTeams',
+        foreignKey: 'teamId',
+        otherKey: 'tournamentId',
+        as: 'tournaments'
+      })
+
       this.belongsTo(models.User, {
         foreignKey: 'ownerId',
         as: 'owner'
