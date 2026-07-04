@@ -1,4 +1,5 @@
-const { StatusCodes } = require("http-status-codes")
+const { StatusCodes } = require("http-status-codes");
+const { AppError } = require("../../utils");
 
 function isgmail(email) {
             return /^[^@]+@gmail\.com$/.test(email);

@@ -30,6 +30,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       },
+      playerPerTeam: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
       registrationDeadline: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW() + INTERVAL '5 days'")
@@ -56,10 +60,14 @@ module.exports = {
 
     await queryInterface.addConstraint('Tournaments', {
       type: 'check',
-      fields: ['maxTeams'],
+      fields: ['maxTeams', 'playerPerTeam'],
       where: {
         maxTeams: {
           [Sequelize.Op.gte]: 2
+        },
+        playerPerTeam: {
+          [Sequelize.Op.gte]: 13,
+          [Sequelize.Op.lte]: 20
         }
       },
       name: "Tournaments minimum number of teams"

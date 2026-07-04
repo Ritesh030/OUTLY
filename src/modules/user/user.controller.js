@@ -15,7 +15,7 @@ const create = async (req, res, next) => {
             const data = req.body
             const response = await userService.create(data)
 
-            const cleanResponse = {role: response.role, name: response.name, id: response.id, email: response.email }
+            const cleanResponse = { role: response.role, name: response.name, id: response.id, email: response.email }
 
             return sendSuccessResponse(res, StatusCodes.CREATED, "User created", cleanResponse)
       } catch (error) {
@@ -30,12 +30,12 @@ const logIn = async (req, res, next) => {
 
             res.cookie('accessToken', response.accessToken, {
                   ...cookieOptions,
-                  maxAge: 15 * 60 * 1000 
+                  maxAge: 15 * 60 * 1000
             })
 
             res.cookie('refreshToken', response.refreshToken, {
                   ...cookieOptions,
-                  maxAge: 7 * 24 * 60 * 60 * 1000 
+                  maxAge: 7 * 24 * 60 * 60 * 1000
             })
 
             const clientResponse = { ...response }
@@ -48,7 +48,31 @@ const logIn = async (req, res, next) => {
       }
 }
 
+const getById = async (req, res, next) => {
+      try {
+            const { id } = req.params
+
+            const user = await userService.getById(id)
+
+            return sendSuccessResponse(res, StatusCodes.OK, "User fetched", user)
+      } catch (error) {
+            next(error)
+      }
+}
+
+const getAll = async (req, res, next) => {
+      try {
+            const users = await userService.getAll()
+
+            return sendSuccessResponse(res, StatusCodes.OK, "Users fetched", users)
+      } catch (error) {
+            next(error)
+      }
+}
+
 module.exports = {
       create,
-      logIn
+      logIn,
+      getAll,
+      getById
 }

@@ -17,7 +17,7 @@ class CrudService {
 
       async getById(id) {
             try {
-                  const response = await this.repository.get(id)
+                  const response = await this.repository.getById(id)
                   return response
             } catch (error) {
                   if(error instanceof AppError) throw error

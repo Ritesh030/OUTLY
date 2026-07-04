@@ -37,10 +37,11 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'TournamentTeams',
+    underscored: false,
     indexes: [
       {
         unique: true,
-        fields: ['tournamentId', 'teamId']
+        fields: ['"tournamentId"', '"teamId"']
       }
     ]
   });

@@ -124,6 +124,36 @@ class TeamRepository extends CrudRepository {
                   throw buildAppError(error, { service: 'team - repository', controller: 'assignCaptain' })
             }
       }
+
+      async getById(id) {
+            try {
+                  const team = await this.model.findByPk(id, {
+                        include: [{ model: User, as: 'member', attributes: ['id', 'name', 'email'], through: { attributes: ['role'] } }]
+                  })
+
+                  if (!team) {
+                        throw new AppError("Team not found", " ", "Team with this id does not exist", StatusCodes.NOT_FOUND);
+                  }
+
+                  return team
+            } catch (error) {
+                  if (error instanceof AppError) throw error
+                  throw buildAppError(error, { service: 'team - repository', controller: 'getById' })
+            }
+      }
+
+      async getAll() {
+            try {
+                  const teams = await this.model.findAll({
+                        include: [{ model: User, as: 'member', attributes: ['id', 'name', 'email'], through: { attributes: ['role'] } }]
+                  })
+
+                  return teams
+            } catch (error) {
+                  if (error instanceof AppError) throw error
+                  throw buildAppError(error, { service: 'team - repository', controller: 'getAll' })
+            }
+      }
 }
 
 module.exports = TeamRepository

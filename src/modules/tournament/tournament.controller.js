@@ -7,12 +7,8 @@ const tournamentService = new TournamentService()
 const create = async (req, res, next) => {
       try {
             const organizerId = req.user.id
-            const { name, formate, status, maxTeams, registrationDeadline, startDate, location, description } = req.body
-            const data = { name, organizerId, formate, status, maxTeams, registrationDeadline, startDate, location, description }
-
-            if(status) {
-                  if(status != "OPEN") throw new AppError("Tournament status error", "Tournament should be open when creating it", "", StatusCodes.BAD_REQUEST)
-            }
+            const { name, formate, maxTeams, playerPerTeam, registrationDeadline, startDate, location, description } = req.body
+            const data = { name, organizerId, formate, maxTeams, playerPerTeam, registrationDeadline, startDate, location, description }
 
             const response = await tournamentService.create(data)
 
@@ -22,6 +18,29 @@ const create = async (req, res, next) => {
       }
 }
 
+const registerTeam = async (req, res, next) => {
+      try {
+            const { tournamentId, teamId } = req.body
+            const tournament = await tournamentService.registerTeam({tournamentId, teamId})
+
+            return sendSuccessResponse(res, StatusCodes.OK, "Team registered", tournament)
+      } catch (error) {
+            next(error)
+      }
+}
+
+const getAll = async (req, res, next) => {
+      try {
+            const tournaments = await tournamentService.getAll()
+
+            return sendSuccessResponse(res, StatusCodes.OK, "Tournaments fetched", tournaments)
+      } catch (error) {
+            next(error)
+      }
+}
+
 module.exports = {
-      create
+      create,
+      registerTeam,
+      getAll
 }

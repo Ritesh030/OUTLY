@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
       })
     }
   }
-  Team.init({
+  Team.init({ 
     name: {
       type: DataTypes.STRING,
       allowNull: false
@@ -45,6 +45,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Team',
+    underscored: false
   });
   return Team;
 };

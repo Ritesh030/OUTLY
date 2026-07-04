@@ -54,6 +54,20 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
+    playerPerTeam: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        min: {
+          args: [13],
+          msg: "Team must contain at least 13 players"
+        },
+        max: {
+          args: [15],
+          msg: "A team can have maximum of 15 players"
+        }
+      }
+    },
     registrationDeadline: {
       type: DataTypes.DATE,
       defaultValue: () => {
@@ -79,6 +93,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Tournament',
+    underscored: false
   });
   return Tournament;
 };
