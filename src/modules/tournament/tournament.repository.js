@@ -47,7 +47,7 @@ class TournamentRepository extends CrudRepository {
       async getAll() {
             try {
                   const tournaments = await db.Tournament.findAll({
-                        attributes: ['id', 'name', 'formate', 'status', 'maxTeams', 'playerPerTeam', 'registrationDeadline', 'startDate', 'location'],
+                        attributes: ['id', 'name', 'organizerId', 'formate', 'status', 'maxTeams', 'playerPerTeam', 'registrationDeadline', 'startDate', 'location'],
                         include: [{
                               model: db.Team,
                               as: 'teams',

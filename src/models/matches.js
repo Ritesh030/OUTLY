@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Match.init({
-    tournametId: {
+    tournamentId: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
