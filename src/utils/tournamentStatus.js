@@ -1,29 +1,38 @@
 const { StatusCodes } = require("http-status-codes")
 const AppError = require("./AppError")
 
-const validTransition = {
-      'OPEN': ['REGISTRATION-CLOSED', 'CANCELLED'],
-      'REGISTRATION-CLOSED': ['ONGOING', 'CANCELLED'],
-      'ONGOING': ['COMPLETED', 'CANCELLED'],
-      'COMPLETED': [],
-      'CANCELLED': []
+const validTransitions = {
+    'OPEN': ['REGISTRATION-CLOSED', 'CANCELLED'],
+    'REGISTRATION-CLOSED': ['ONGOING', 'CANCELLED'],
+    'ONGOING': ['COMPLETED', 'CANCELLED'],
+    'COMPLETED': [],
+    'CANCELLED': []
 }
 
-const validateStatusTransition = (currentState, nextState) => {
-      const availableTransition = validTransition[currentState]
+const isValidStatusTransition = (currentState, nextState) => {
+    const availableTransitions = validTransitions[currentState]
 
-      if (!availableTransition || !availableTransition.include(nextState)) {
-            throw new AppError(
-                  "Invalid Status Transition",
-                  " ",
-                  `Cannot change tournament status from ${currentStatus} to ${nextStatus}.`,
-                  StatusCodes.BAD_REQUEST
-            );
-      }
+    if (!availableTransitions) {
+        throw new AppError(
+            "Invalid Status",
+            " ",
+            `'${currentState}' is not a valid tournament status.`,
+            StatusCodes.BAD_REQUEST
+        )
+    }
 
-      return true
+    if (!availableTransitions.includes(nextState)) {
+        throw new AppError(
+            "Invalid Status Transition",
+            " ",
+            `Cannot change tournament status from '${currentState}' to '${nextState}'.`,
+            StatusCodes.BAD_REQUEST
+        )
+    }
+
+    return true
 }
 
 module.exports = {
-      validateStatusTransition
+    isValidStatusTransition
 }

@@ -39,8 +39,20 @@ const getAll = async (req, res, next) => {
       }
 }
 
+const updateStatus = async (req, res, next) => {
+      try {
+            const {tournamentId, newStatus} = req.body
+            const response = await tournamentService.updateStatus({tournamentId, newStatus})
+
+            return sendSuccessResponse(res, StatusCodes.OK, "status updated", response)
+      } catch (error) {
+            next(error)
+      }
+}
+
 module.exports = {
       create,
       registerTeam,
-      getAll
+      getAll,
+      updateStatus
 }

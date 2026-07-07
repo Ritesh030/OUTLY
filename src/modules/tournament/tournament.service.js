@@ -1,4 +1,5 @@
 const { AppError, buildAppError } = require("../../utils");
+const { isValidStatusTransition } = require("../../utils/tournamentStatus");
 const CrudService = require("../crud/curd.service");
 const TournamentRepository = require("./tournament.repository");
 
@@ -17,6 +18,18 @@ class TournamentService extends CrudService {
                   if (error instanceof AppError) throw error
                   throw buildAppError(error, { service: 'tournament - service', controller: 'registerTeam' })
             }
+      }
+
+      async updateStatus({ tournamentId, newStatus }) {
+            const tournament = await this.repository.getById(tournamentId)
+
+            isValidStatusTransition(tournament.status, newStatus)
+
+            tournament.status = newStatus
+
+            await tournament.save()
+
+            return await this.repository.getTournament(tournamentId)
       }
 }
 

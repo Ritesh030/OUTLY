@@ -109,7 +109,7 @@ class TournamentRepository extends CrudRepository {
                               throw new AppError("Already Registered", " ", "This team is already registered.", StatusCodes.BAD_REQUEST)
                         }
 
-                        // 7. Validate player count BEFORE adding
+                        // 7. Validate player count
                         const playersInTeam = await team.getMember({ transaction })
                         if (playersInTeam.length !== tournament.playerPerTeam) {
                               throw new AppError(
@@ -119,10 +119,23 @@ class TournamentRepository extends CrudRepository {
                               )
                         }
 
-                        // 8. Register team and players
-                        await tournament.addTeams(team, { transaction })
+                        // 8. Check if any player is already registered via a different team
+                        const playerIds = playersInTeam.map(p => p.id)
+                        const alreadyRegisteredPlayers = await db.TournamentPlayers.findAll({
+                              where: { tournamentId: tournament.id, userId: playerIds },
+                              transaction
+                        })
+                        if (alreadyRegisteredPlayers.length > 0) {
+                              const conflictingIds = alreadyRegisteredPlayers.map(p => p.userId)
+                              throw new AppError(
+                                    "Player Already Registered", " ",
+                                    `Players with ids [${conflictingIds.join(', ')}] are already registered in this tournament via another team.`,
+                                    StatusCodes.CONFLICT
+                              )
+                        }
 
-                        // Manually insert each player with teamId included
+                        // 9. Register team and players
+                        await tournament.addTeams(team, { transaction })
                         await Promise.all(
                               playersInTeam.map(player =>
                                     db.TournamentPlayers.create({
