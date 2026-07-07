@@ -1,9 +1,10 @@
 const express = require('express')
 const { validateUserJWT } = require('../../middleware/user/user.validate')
-const { generateFixtures } = require('./matches.controller')
+const { generateFixtures, createMatchResult, changeMatchStatus } = require('./matches.controller')
 
 const matchRouter = express.Router()
 
-matchRouter.post('/:tournamentId/fixture', validateUserJWT, generateFixtures)
+matchRouter.post('/result', validateUserJWT, createMatchResult)
+matchRouter.patch('/:matchId/status', validateUserJWT, changeMatchStatus)
 
 module.exports = matchRouter

@@ -6,7 +6,7 @@ const { executeInTransaction } = require("../../utils/transactionHelper");
 
 class MatchesRepository extends CrudRepository {
       constructor() {
-            super(db.Match)
+            super(db.Match) // all the curd funx are for match model
       }
 
       async generateRoundRobin(tournamentId, teams, transaction) {
@@ -71,6 +71,29 @@ class MatchesRepository extends CrudRepository {
             } catch (error) {
                   if (error instanceof AppError) throw error
                   throw buildAppError(error, { service: 'matches - repository', controller: 'generateFixtures' })
+            }
+      }
+
+      async changeMatchStatus(match, newStatus) {
+            try {
+                  match.status = newStatus
+                  await match.save()
+
+                  return match
+            } catch (error) {
+                  if (error instanceof AppError) throw error
+                  throw buildAppError(error, { service: 'matches - repository', controller: 'changeMatchStatus' })
+            }
+      }
+
+      async createMatchResult(data) {
+            try {
+                  const matchresult = await db.MatchResult.create(data)
+      
+                  return matchresult
+            } catch (error) {
+                  if (error instanceof AppError) throw error
+                  throw buildAppError(error, { service: 'matches - repository', controller: 'createMatchResult' })
             }
       }
 }

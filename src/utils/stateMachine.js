@@ -9,6 +9,14 @@ const validTransitions = {
     'CANCELLED': []
 }
 
+const validMatchTransitions = {
+    'SCHEDULED': ['ONGOING', 'ABANDONED', 'POSTPONED'],
+    'ONGOING': ['COMPLETED', 'ABANDONED'],
+    'COMPLETED': [],
+    'ABANDONED': [],
+    'POSTPONED': []
+}
+
 const isValidStatusTransition = (currentState, nextState) => {
     const availableTransitions = validTransitions[currentState]
 
@@ -33,6 +41,31 @@ const isValidStatusTransition = (currentState, nextState) => {
     return true
 }
 
+const isValidStatusTransitionForMatch = (currentState, nextState) => {
+    const availableTransitions = validMatchTransitions[currentState]
+
+    if(!availableTransitions) {
+        throw new AppError(
+            "Invalid Status",
+            " ",
+            `'${currentState}' is not a valid match status.`,
+            StatusCodes.BAD_REQUEST
+        )
+    }
+
+    if (!availableTransitions.includes(nextState)) {
+        throw new AppError(
+            "Invalid Status Transition",
+            " ",
+            `Cannot change match status from '${currentState}' to '${nextState}'.`,
+            StatusCodes.BAD_REQUEST
+        )
+    }
+
+    return true
+}
+
 module.exports = {
-    isValidStatusTransition
+    isValidStatusTransition,
+    isValidStatusTransitionForMatch
 }

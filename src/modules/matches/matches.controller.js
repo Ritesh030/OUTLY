@@ -17,6 +17,37 @@ const generateFixtures = async (req, res, next) => {
       }
 }
 
+const createMatchResult = async (req, res, next) => {
+      try {
+            const userId = req.user.id
+            const {matchId, winnerTeamId, teamARuns, teamAOvers, teamAWickets, teamBRuns, teamBOvers, teamBWickets, resultType, note} = req.body
+
+            const data = {matchId, winnerTeamId, teamARuns, teamAOvers, teamAWickets, teamBRuns, teamBOvers, teamBWickets, resultType, note}
+
+            const response = await matchesService.createMatchResult({userId, data})
+
+            return sendSuccessResponse(res, StatusCodes.CREATED, "match result recorded", response)
+      } catch (error) {
+            next(error)
+      }
+}
+
+const changeMatchStatus = async (req, res, next) => {
+      try {
+            const userId = req.user.id
+            const { matchId } = req.params
+            const {newStatus} = req.body
+
+            const result = await matchesService.changeMatchStatus({userId, matchId, newStatus})
+
+            return sendSuccessResponse(res, StatusCodes.OK, "status updated", result)
+      } catch (error) {
+            next(error)
+      }
+}
+
 module.exports = {
-      generateFixtures
+      generateFixtures,
+      createMatchResult,
+      changeMatchStatus
 }

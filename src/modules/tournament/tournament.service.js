@@ -1,5 +1,5 @@
 const { AppError, buildAppError } = require("../../utils");
-const { isValidStatusTransition } = require("../../utils/tournamentStatus");
+const { isValidStatusTransition } = require("../../utils/stateMachine");
 const CrudService = require("../crud/curd.service");
 const TournamentRepository = require("./tournament.repository");
 
