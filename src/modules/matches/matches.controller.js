@@ -46,8 +46,20 @@ const changeMatchStatus = async (req, res, next) => {
       }
 }
 
+const getPointsTable = async (req, res, next) => {
+      try {
+            const { tournamentId } = req.params
+
+            const result = await matchesService.getPointsTable(tournamentId)
+
+            return sendSuccessResponse(res, StatusCodes.OK, "Points tables generated", result)
+      } catch (error) {
+            next(error)
+      }
+}
 module.exports = {
       generateFixtures,
       createMatchResult,
-      changeMatchStatus
+      changeMatchStatus,
+      getPointsTable
 }

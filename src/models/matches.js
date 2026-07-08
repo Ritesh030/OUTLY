@@ -16,6 +16,11 @@ module.exports = (sequelize, DataTypes) => {
         as: 'tournament'
       })
 
+      this.hasOne(models.MatchResult, {
+        foreignKey: 'matchId',
+        as: 'result'
+      });
+
     }
   }
   Match.init({

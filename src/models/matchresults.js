@@ -10,20 +10,24 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      this.belongsTo(models.Match, {
+        foreignKey: 'matchId',
+        as: 'match'
+      });
     }
   }
   MatchResult.init({
     matchId: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      unique: true
     },
     winnerTeamId: DataTypes.INTEGER,
     teamARuns: DataTypes.INTEGER,
-    teamAOvers: DataTypes.INTEGER,
+    teamABalls: DataTypes.INTEGER,
     teamAWickets: DataTypes.INTEGER,
     teamBRuns: DataTypes.INTEGER,
-    teamBOvers: DataTypes.INTEGER,
+    teamBBalls: DataTypes.INTEGER,
     teamBWickets: DataTypes.INTEGER,
     resultType: {
       type: DataTypes.ENUM('WIN', 'TIE', 'NO_RESULT'),

@@ -48,7 +48,7 @@ class MatchesRepository extends CrudRepository {
                               "Cannot generate a schedule: No valid participating teams found.", " ", StatusCodes.BAD_REQUEST);
                   }
 
-                  const createdMatches = await db.Match.bulkCreate(matchesToCreate, {transaction});
+                  const createdMatches = await db.Match.bulkCreate(matchesToCreate, { transaction });
                   return createdMatches;
 
             } catch (error) {
@@ -89,11 +89,96 @@ class MatchesRepository extends CrudRepository {
       async createMatchResult(data) {
             try {
                   const matchresult = await db.MatchResult.create(data)
-      
+
                   return matchresult
             } catch (error) {
                   if (error instanceof AppError) throw error
                   throw buildAppError(error, { service: 'matches - repository', controller: 'createMatchResult' })
+            }
+      }
+
+      async getPointsTable(tournamentId) {
+            try {
+                  // 1. Get all teams registered in this tournament
+                  const teams = await db.TournamentTeams.findAll({
+                        where: { tournamentId },
+                        include: [{
+                              model: db.Team,
+                              as: 'Team',
+                              attributes: ['id', 'name']
+                        }]
+                  })
+
+                  // 2. Get all completed matches with their results
+                  const matches = await db.Match.findAll({
+                        where: {
+                              tournamentId,
+                              status: 'COMPLETED'
+                        },
+                        include: [{
+                              model: db.MatchResult,
+                              as: 'result'
+                        }]
+                  })
+
+                  // 3. Build points map from registered teams
+                  const pointsMap = {}
+                  teams.forEach(t => {
+                        pointsMap[t.teamId] = {
+                              teamId: t.teamId,
+                              teamName: t.Team.name,
+                              played: 0,
+                              won: 0,
+                              lost: 0,
+                              tied: 0,
+                              noResult: 0,
+                              points: 0
+                        }
+                  })
+
+                  // 4. Process each match result
+                  matches.forEach(match => {
+                        const result = match.result
+                        if (!result) return  
+
+                        const teamA = pointsMap[match.teamAId]
+                        const teamB = pointsMap[match.teamBId]
+                        if (!teamA || !teamB) return
+
+                        teamA.played++
+                        teamB.played++
+
+                        if (result.resultType === 'WIN') {
+                              if (result.winnerTeamId === match.teamAId) {
+                                    teamA.won++
+                                    teamA.points += 2
+                                    teamB.lost++
+                              } else {
+                                    teamB.won++
+                                    teamB.points += 2
+                                    teamA.lost++
+                              }
+
+                        } else if (result.resultType === 'TIE') {
+                              teamA.tied++
+                              teamB.tied++
+                              teamA.points += 1
+                              teamB.points += 1
+
+                        } else if (result.resultType === 'NO_RESULT') {
+                              teamA.noResult++
+                              teamB.noResult++
+                              teamA.points += 1  
+                              teamB.points += 1
+                        }
+                  })
+
+                  // 5. Sort by points descending
+                  return Object.values(pointsMap).sort((a, b) => b.points - a.points)
+
+            } catch (error) {
+                  if (error instanceof AppError) throw error
+                  throw buildAppError(error, { service: 'matches - repository', controller: 'getPointsTable' })
             }
       }
 }

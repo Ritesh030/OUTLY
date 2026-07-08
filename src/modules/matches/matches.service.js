@@ -93,6 +93,16 @@ class MatchesService extends CrudService {
                   throw buildAppError(error, { service: 'matches - service', controller: 'changeMatchStatus' })
             }
       }
+
+      async getPointsTable(tournamentId) {
+            try {
+                  const result = await this.repository.getPointsTable(tournamentId)
+                  return result
+            } catch (error) {
+                  if (error instanceof AppError) throw error
+                  throw buildAppError(error, { service: 'matches - service', controller: 'getPointsTable' })
+            }
+      }
 }
 
 module.exports = MatchesService

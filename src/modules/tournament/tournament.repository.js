@@ -11,7 +11,7 @@ class TournamentRepository extends CrudRepository {
 
       async getTeamsCount(tournamentId, transaction = null) {
             const count = await db.TournamentTeams.count({
-                  where: { tournamentId: tournamentId }, transaction
+                  where: { tournamentId: tournamentId },lock: transaction?.LOCK?.UPDATE, transaction
             })
 
             return count
@@ -74,7 +74,7 @@ class TournamentRepository extends CrudRepository {
                   return await executeInTransaction(db.sequelize, async (transaction) => {
 
                         // 1. Validate tournament exists
-                        const tournament = await db.Tournament.findByPk(tournamentId, { transaction })
+                        const tournament = await db.Tournament.findByPk(tournamentId, {lock: transaction.LOCK.UPDATE, transaction })
                         if (!tournament) {
                               throw new AppError("Not Found", " ", "Tournament with this id does not exist.", StatusCodes.NOT_FOUND)
                         }
