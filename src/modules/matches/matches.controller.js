@@ -33,11 +33,11 @@ const recreateFixtures = async (req, res, next) => {
 const createMatchResult = async (req, res, next) => {
       try {
             const userId = req.user.id
-            const {matchId, winnerTeamId, teamARuns, teamABalls, teamAWickets, teamBRuns, teamBBalls, teamBWickets, resultType, note} = req.body
+            const { matchId, winnerTeamId, teamARuns, teamABalls, teamAWickets, teamBRuns, teamBBalls, teamBWickets, resultType, note } = req.body
 
-            const data = {matchId, winnerTeamId, teamARuns, teamABalls, teamAWickets, teamBRuns, teamBBalls, teamBWickets, resultType, note}
+            const data = { matchId, winnerTeamId, teamARuns, teamABalls, teamAWickets, teamBRuns, teamBBalls, teamBWickets, resultType, note }
 
-            const response = await matchesService.createMatchResult({userId, data})
+            const response = await matchesService.createMatchResult({ userId, data })
 
             return sendSuccessResponse(res, StatusCodes.CREATED, "match result recorded", response)
       } catch (error) {
@@ -45,15 +45,15 @@ const createMatchResult = async (req, res, next) => {
       }
 }
 
-const updateMatchResult = async (req ,res, next) => {
+const updateMatchResult = async (req, res, next) => {
       try {
             const userId = req.user.id
             const matchId = req.params.matchId
-            const {winnerTeamId, teamARuns, teamABalls, teamAWickets, teamBRuns, teamBBalls, teamBWickets, resultType, note} = req.body
+            const { winnerTeamId, teamARuns, teamABalls, teamAWickets, teamBRuns, teamBBalls, teamBWickets, resultType, note } = req.body
 
-            const data = {winnerTeamId, teamARuns, teamABalls, teamAWickets, teamBRuns, teamBBalls, teamBWickets, resultType, note}
+            const data = { winnerTeamId, teamARuns, teamABalls, teamAWickets, teamBRuns, teamBBalls, teamBWickets, resultType, note }
 
-            const response = await matchesService.updateMatchResult({userId, matchId, data})
+            const response = await matchesService.updateMatchResult({ userId, matchId, data })
 
             return sendSuccessResponse(res, StatusCodes.OK, "Match result updated", response)
       } catch (error) {
@@ -65,9 +65,9 @@ const changeMatchStatus = async (req, res, next) => {
       try {
             const userId = req.user.id
             const { matchId } = req.params
-            const {newStatus} = req.body
+            const { newStatus } = req.body
 
-            const result = await matchesService.changeMatchStatus({userId, matchId, newStatus})
+            const result = await matchesService.changeMatchStatus({ userId, matchId, newStatus })
 
             return sendSuccessResponse(res, StatusCodes.OK, "status updated", result)
       } catch (error) {
@@ -86,11 +86,24 @@ const getPointsTable = async (req, res, next) => {
             next(error)
       }
 }
+
+const getCompletedMatches = async (req, res, next) => {
+      try {
+            const { tournamentId } = req.params
+
+            const response = await matchesService.getCompletedMatches(tournamentId)
+
+            return sendSuccessResponse(res, StatusCodes.OK, "Completed matches fetched", response)
+      } catch (error) {
+            next(error)
+      }
+}
 module.exports = {
       generateFixtures,
       createMatchResult,
       updateMatchResult,
       changeMatchStatus,
       getPointsTable,
-      recreateFixtures
+      recreateFixtures,
+      getCompletedMatches
 }
