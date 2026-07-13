@@ -238,9 +238,10 @@ class MatchesRepository extends CrudRepository {
                   }
 
                   const previousWinnerId = matchResult.winnerTeamId
+                  const previousResultType = matchResult.resultType
                   await matchResult.update(data, { transaction: t })
 
-                  return { matchResult, previousWinnerId }
+                  return { matchResult, previousWinnerId, previousResultType }
             }
 
             try {

@@ -91,6 +91,12 @@ class MatchesService extends CrudService {
 
       async createMatchResult({ userId, data }) {
             try {
+                  const VALID_RESULT_TYPES = ['WIN', 'TIE', 'NO_RESULT'] 
+
+                  if (!data.resultType || !VALID_RESULT_TYPES.includes(data.resultType)) {
+                        throw new AppError("Invalid resultType", " ", `resultType must be one of: ${VALID_RESULT_TYPES.join(', ')}`, StatusCodes.BAD_REQUEST)
+                  }
+
                   const match = await this.repository.getById(data.matchId)
                   if (!match) {
                         throw new AppError("Not Found", " ", "Match with this id does not exist.", StatusCodes.NOT_FOUND)
@@ -140,6 +146,12 @@ class MatchesService extends CrudService {
 
       async updateMatchResult({ userId, matchId, data }) {
             try {
+                  const VALID_RESULT_TYPES = ['WIN', 'TIE', 'NO_RESULT'] 
+
+                  if (!data.resultType || !VALID_RESULT_TYPES.includes(data.resultType)) {
+                        throw new AppError("Invalid resultType", " ", `resultType must be one of: ${VALID_RESULT_TYPES.join(', ')}`, StatusCodes.BAD_REQUEST)
+                  }
+
                   const match = await this.repository.getById(matchId)
                   if (!match) {
                         throw new AppError("Not Found", " ", "Match with this id does not exist.", StatusCodes.NOT_FOUND)
@@ -160,26 +172,33 @@ class MatchesService extends CrudService {
                   }
 
                   // 1. Update result and adjust totalWins in one transaction
-                  const { matchResult, previousWinnerId } = await executeInTransaction(db.sequelize, async (transaction) => {
+                  const { matchResult, previousWinnerId, previousResultType } = await executeInTransaction(db.sequelize, async (transaction) => {
                         const updateResult = await this.repository.updateMatchResult(matchId, data, transaction)
-                        const winnerChanged = updateResult.previousWinnerId !== data.winnerTeamId
 
-                        if (winnerChanged) {
-                              if (updateResult.previousWinnerId) {
-                                    await this.teamRepository.decrementWins(updateResult.previousWinnerId, transaction)
-                              }
-                              if (data.resultType === 'WIN') {
-                                    await this.teamRepository.incrementWins(data.winnerTeamId, transaction)
-                              }
+                        const previousWasWin = updateResult.previousResultType === 'WIN' && updateResult.previousWinnerId
+                        const newIsWin = data.resultType === 'WIN' && data.winnerTeamId
+
+                        if (previousWasWin) {
+                              await this.teamRepository.decrementWins(updateResult.previousWinnerId, transaction)
+                        }
+
+                        if (newIsWin) {
+                              await this.teamRepository.incrementWins(data.winnerTeamId, transaction)
                         }
 
                         return updateResult
                   })
 
                   // 2. Redis leaderboard — eventual consistency, fire and forget
-                  if (previousWinnerId !== data.winnerTeamId) {
-                        if (previousWinnerId) decrementTeamScore(previousWinnerId)
-                        if (data.resultType === 'WIN') incrementTeamScore(data.winnerTeamId)
+                  const previousWasWin = previousResultType === 'WIN' && previousWinnerId
+                  const newIsWin = data.resultType === 'WIN' && data.winnerTeamId
+
+                  if (previousWasWin) {
+                        decrementTeamScore(previousWinnerId)
+                  }
+
+                  if (newIsWin) {
+                        incrementTeamScore(data.winnerTeamId)
                   }
 
                   return matchResult

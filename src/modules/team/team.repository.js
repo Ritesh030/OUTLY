@@ -160,7 +160,7 @@ class TeamRepository extends CrudRepository {
       async getTeamsForLeaderboard(limit = null) {
             try {
                   const teams = await this.model.findAll({
-                        attributes: ['id', 'totalWins'],
+                        attributes: ['id', 'name', 'totalWins'],
                         order: [['totalWins', 'DESC']],
                         ...(limit ? { limit } : {})
                   })
@@ -175,11 +175,10 @@ class TeamRepository extends CrudRepository {
       // for leaderboard calculation
       async incrementWins(teamId, transaction) {
             try {
-                  await this.model.increment('totalWins', {
-                        by: 1,
-                        where: { id: teamId },
-                        transaction
-                  })
+                  await this.model.update(
+                        { totalWins: sequelize.literal('"totalWins" + 1') },
+                        { where: { id: teamId }, transaction }
+                  )
             } catch (error) {
                   if (error instanceof AppError) throw error
                   throw buildAppError(error, { service: 'team - repository', controller: 'incrementWins' })
@@ -188,11 +187,10 @@ class TeamRepository extends CrudRepository {
 
       async decrementWins(teamId, transaction) {
             try {
-                  await this.model.decrement('totalWins', {
-                        by: 1,
-                        where: { id: teamId, totalWins: { [Op.gt]: 0 } },
-                        transaction
-                  })
+                  await this.model.update(
+                        { totalWins: sequelize.literal('CASE WHEN "totalWins" > 0 THEN "totalWins" - 1 ELSE 0 END') },
+                        { where: { id: teamId }, transaction }
+                  )
             } catch (error) {
                   if (error instanceof AppError) throw error
                   throw buildAppError(error, { service: 'team - repository', controller: 'decrementWins' })
