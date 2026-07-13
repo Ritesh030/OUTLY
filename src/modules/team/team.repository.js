@@ -1,7 +1,9 @@
+const { Op } = require("sequelize");
+
 const CrudRepository = require("../crud/crud.repository");
+const UserRepository = require("../user/user.repository");
 const { Team, User, UserTeam, sequelize } = require("../../models/index");
 const { AppError, buildAppError } = require("../../utils");
-const UserRepository = require("../user/user.repository");
 const { StatusCodes } = require("http-status-codes");
 const { executeInTransaction } = require("../../utils/transactionHelper");
 
@@ -152,6 +154,48 @@ class TeamRepository extends CrudRepository {
             } catch (error) {
                   if (error instanceof AppError) throw error
                   throw buildAppError(error, { service: 'team - repository', controller: 'getAll' })
+            }
+      }
+
+      async getTeamsForLeaderboard() {
+            try {
+                  const teams = await this.model.findAll({
+                        attributes: ['id', 'name', 'totalWins'],
+                        order: [['totalWins', 'DESC']],
+                        limit
+                  })
+
+                  return teams
+            } catch (error) {
+                  if (error instanceof AppError) throw error
+                  throw buildAppError(error, { service: 'team - repository', controller: 'getTeamsForLeaderboard' })
+            }
+      }
+
+      // for leaderboard calculation
+      async incrementWins(teamId, transaction) {
+            try {
+                  await this.model.increment('totalWins', {
+                        by: 1,
+                        where: { id: teamId },
+                        transaction
+                  })
+            } catch (error) {
+                  if (error instanceof AppError) throw error
+                  throw buildAppError(error, { service: 'team - repository', controller: 'incrementWins' })
+            }
+      }
+
+      async decrementWins(teamId, transaction) {
+            try {
+                  await this.model.decrement('totalWins', {
+                        by: 1,
+                        where: { id: teamId, totalWins: { [Op.gt]: 0 } },
+                        transaction
+                  })
+            } catch (error) {
+                  if (error instanceof AppError) throw error
+                  throw buildAppError(error, { service: 'team - repository', controller: 'decrementWins' })
             }
       }
 }

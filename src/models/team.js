@@ -32,15 +32,25 @@ module.exports = (sequelize, DataTypes) => {
       })
     }
   }
-  Team.init({ 
+  Team.init({
     name: {
       type: DataTypes.STRING,
       allowNull: false
     },
     ownerId: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       require: true
+    },
+    totalWins: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      validate: {
+        min: {
+          args: [0],
+          msg: "totalWins cannot be less that 0"
+        }
+      }
     }
   }, {
     sequelize,

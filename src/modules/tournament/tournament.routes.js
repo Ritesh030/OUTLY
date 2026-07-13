@@ -3,7 +3,7 @@ const { validateTournamentData } = require('../../middleware/tournament/tourname
 const { create, registerTeam, getAll, updateStatus } = require('./tournament.controller')
 const { validateUserJWT } = require('../../middleware/user/user.validate')
 const { isOrganizer, isAdminOrOrganizer, isAdmin } = require('../../middleware/user/user.role')
-const { generateFixtures, getPointsTable } = require('../matches/matches.controller')
+const { generateFixtures, getPointsTable, recreateFixtures } = require('../matches/matches.controller')
 
 const tournamentRoutes = express.Router()
 
@@ -13,6 +13,8 @@ tournamentRoutes.post('/:tournamentId/fixture', validateUserJWT, generateFixture
 
 tournamentRoutes.get('/', validateUserJWT, getAll)
 tournamentRoutes.get('/:tournamentId/pointstable', validateUserJWT, getPointsTable)
+
+tournamentRoutes.put('/:tournamentId/fixture/recreate', validateUserJWT, recreateFixtures)
 
 tournamentRoutes.patch('/status', validateUserJWT, isAdminOrOrganizer, updateStatus)
 
