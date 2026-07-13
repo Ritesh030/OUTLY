@@ -24,7 +24,22 @@ async function getLeaderboard(start = 0, stop = -1) {
 
 async function getTeamRank(teamId) {
       const rank = await redisClient.zrevrank(LEADERBOARD_KEY, String(teamId))
-      return rank === null ? null : rank + 1 
+      return rank === null ? null : rank + 1
 }
 
-module.exports = { incrementTeamScore, decrementTeamScore, getLeaderboard, getTeamRank, LEADERBOARD_KEY }
+async function rebuildLeaderboard(teamRepository) {
+      const teams = await teamRepository.getTeamsForLeaderboard()
+
+      const pipeline = redisClient.pipeline()
+      pipeline.del(LEADERBOARD_KEY)
+      for (const team of teams) {
+            if (team.totalWins > 0) {
+                  pipeline.zadd(LEADERBOARD_KEY, team.totalWins, String(team.id))
+            }
+      }
+      await pipeline.exec()
+
+      return teams.length
+}
+
+module.exports = { incrementTeamScore, decrementTeamScore, getLeaderboard, getTeamRank, rebuildLeaderboard }

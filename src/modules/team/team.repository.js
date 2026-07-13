@@ -157,12 +157,12 @@ class TeamRepository extends CrudRepository {
             }
       }
 
-      async getTeamsForLeaderboard() {
+      async getTeamsForLeaderboard(limit = null) {
             try {
                   const teams = await this.model.findAll({
-                        attributes: ['id', 'name', 'totalWins'],
+                        attributes: ['id', 'totalWins'],
                         order: [['totalWins', 'DESC']],
-                        limit
+                        ...(limit ? { limit } : {})
                   })
 
                   return teams
