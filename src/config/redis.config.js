@@ -3,6 +3,7 @@ const Redis = require('ioredis')
 const redisClient = new Redis({
     host: '127.0.0.1', // Default local Redis server
     port: 6379,
+    enableOfflineQueue: false, // if we use this then the http req will be on hold until the retry loop runs which increases the performance
     retryStrategy(times) {
         // Automatically attempt reconnection if connection drops
         const delay = Math.min(times * 50, 2000);
