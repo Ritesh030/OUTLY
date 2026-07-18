@@ -9,6 +9,7 @@ const { isValidStatusTransitionForMatch } = require("../../utils/stateMachine");
 const { incrementTeamScore, decrementTeamScore } = require('../../utils/redis/redisLeaderboard');
 const { executeInTransaction } = require("../../utils/transactionHelper");
 const db = require("../../models");
+const { getPointsTableFromRedis, setPointsTableInRedis } = require("../../utils/redis/redisPointsTable");
 
 class MatchesService extends CrudService {
       constructor() {
@@ -91,7 +92,7 @@ class MatchesService extends CrudService {
 
       async createMatchResult({ userId, data }) {
             try {
-                  const VALID_RESULT_TYPES = ['WIN', 'TIE', 'NO_RESULT'] 
+                  const VALID_RESULT_TYPES = ['WIN', 'TIE', 'NO_RESULT']
 
                   if (!data.resultType || !VALID_RESULT_TYPES.includes(data.resultType)) {
                         throw new AppError("Invalid resultType", " ", `resultType must be one of: ${VALID_RESULT_TYPES.join(', ')}`, StatusCodes.BAD_REQUEST)
@@ -131,6 +132,9 @@ class MatchesService extends CrudService {
                         return matchResult
                   })
 
+                  // just clear the points table in redis
+                  await clearPointsTableCache(data.tournamentId)
+
                   // 2. Redis leaderboard — eventual consistency, fire and forget
                   if (data.resultType === 'WIN') {
                         incrementTeamScore(data.winnerTeamId)
@@ -146,7 +150,7 @@ class MatchesService extends CrudService {
 
       async updateMatchResult({ userId, matchId, data }) {
             try {
-                  const VALID_RESULT_TYPES = ['WIN', 'TIE', 'NO_RESULT'] 
+                  const VALID_RESULT_TYPES = ['WIN', 'TIE', 'NO_RESULT']
 
                   if (!data.resultType || !VALID_RESULT_TYPES.includes(data.resultType)) {
                         throw new AppError("Invalid resultType", " ", `resultType must be one of: ${VALID_RESULT_TYPES.join(', ')}`, StatusCodes.BAD_REQUEST)
@@ -188,6 +192,9 @@ class MatchesService extends CrudService {
 
                         return updateResult
                   })
+
+                  // just clear the points table in redis
+                  await clearPointsTableCache(data.tournamentId)
 
                   // 2. Redis leaderboard — eventual consistency, fire and forget
                   const previousWasWin = previousResultType === 'WIN' && previousWinnerId
@@ -238,7 +245,20 @@ class MatchesService extends CrudService {
 
       async getPointsTable(tournamentId) {
             try {
+                  const pointsTable = await getPointsTableFromRedis(tournamentId)
+
+                  if (pointsTable) {
+                        return pointsTable
+                  }
+
                   const result = await this.repository.getPointsTable(tournamentId)
+
+                  if (!result) {
+                        return null
+                  }
+
+                  const response = await setPointsTableInRedis(tournamentId, result)
+
                   return result
             } catch (error) {
                   if (error instanceof AppError) throw error

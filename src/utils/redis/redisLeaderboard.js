@@ -53,7 +53,7 @@ async function rebuildLeaderboard(teamRepository) {
       try {
             const teams = await teamRepository.getTeamsForLeaderboard()
 
-            const pipeline = redisClient.pipeline()
+            const pipeline = redisClient.pipeline() // Batching mechanism. Instead of sending requests back and forth over the network for every single team, it stacks all commands up and executes them inside a single network round-trip (pipeline.exec()).
             pipeline.del(LEADERBOARD_KEY)
             for (const team of teams) {
                   if (Number(team.totalWins) > 0) {
