@@ -4,12 +4,13 @@ const CrudService = require("../crud/curd.service");
 const TournamentRepository = require("../tournament/tournament.repository");
 const MatchesRepository = require("./matches.repository");
 const TeamRepository = require("../team/team.repository");
+const db = require("../../models");
+
 const { buildAppError, AppError } = require("../../utils");
 const { isValidStatusTransitionForMatch } = require("../../utils/stateMachine");
 const { incrementTeamScore, decrementTeamScore } = require('../../utils/redis/redisLeaderboard');
 const { executeInTransaction } = require("../../utils/transactionHelper");
-const db = require("../../models");
-const { getPointsTableFromRedis, setPointsTableInRedis } = require("../../utils/redis/redisPointsTable");
+const { getPointsTableFromCache, setPointsTableInRedis, clearPointsTableCache } = require("../../utils/redis/redisPointsTable");
 
 class MatchesService extends CrudService {
       constructor() {
@@ -133,7 +134,7 @@ class MatchesService extends CrudService {
                   })
 
                   // just clear the points table in redis
-                  await clearPointsTableCache(data.tournamentId)
+                  clearPointsTableCache(data.tournamentId)
 
                   // 2. Redis leaderboard — eventual consistency, fire and forget
                   if (data.resultType === 'WIN') {
@@ -194,7 +195,7 @@ class MatchesService extends CrudService {
                   })
 
                   // just clear the points table in redis
-                  await clearPointsTableCache(data.tournamentId)
+                  clearPointsTableCache(data.tournamentId)
 
                   // 2. Redis leaderboard — eventual consistency, fire and forget
                   const previousWasWin = previousResultType === 'WIN' && previousWinnerId
@@ -245,9 +246,10 @@ class MatchesService extends CrudService {
 
       async getPointsTable(tournamentId) {
             try {
-                  const pointsTable = await getPointsTableFromRedis(tournamentId)
+                  const pointsTable = await getPointsTableFromCache(tournamentId)
 
                   if (pointsTable) {
+                        console.log(`Points table retured successfully from redis for tournamentId: ${tournamentId}`)
                         return pointsTable
                   }
 
@@ -257,7 +259,7 @@ class MatchesService extends CrudService {
                         return null
                   }
 
-                  const response = await setPointsTableInRedis(tournamentId, result)
+                  setPointsTableInRedis(tournamentId, result)
 
                   return result
             } catch (error) {
