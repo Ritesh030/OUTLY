@@ -11,6 +11,8 @@ const { isValidStatusTransitionForMatch } = require("../../utils/stateMachine");
 const { incrementTeamScore, decrementTeamScore } = require('../../utils/redis/redisLeaderboard');
 const { executeInTransaction } = require("../../utils/transactionHelper");
 const { getPointsTableFromCache, setPointsTableInRedis, clearPointsTableCache } = require("../../utils/redis/redisPointsTable");
+const { Backoffs } = require("bullmq");
+const { standingsQueue } = require("../bullMQ/queues");
 
 class MatchesService extends CrudService {
       constructor() {
@@ -133,8 +135,10 @@ class MatchesService extends CrudService {
                         return matchResult
                   })
 
-                  // just clear the points table in redis
-                  clearPointsTableCache(data.tournamentId)
+                  // // just clear the points table in redis
+                  // clearPointsTableCache(data.tournamentId)
+
+                  
 
                   // 2. Redis leaderboard — eventual consistency, fire and forget
                   if (data.resultType === 'WIN') {
@@ -194,8 +198,10 @@ class MatchesService extends CrudService {
                         return updateResult
                   })
 
-                  // just clear the points table in redis
-                  clearPointsTableCache(data.tournamentId)
+                  // // just clear the points table in redis
+                  // clearPointsTableCache(data.tournamentId)
+
+                  
 
                   // 2. Redis leaderboard — eventual consistency, fire and forget
                   const previousWasWin = previousResultType === 'WIN' && previousWinnerId

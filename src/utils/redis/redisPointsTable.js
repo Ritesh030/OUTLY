@@ -5,9 +5,9 @@ async function getPointsTableFromCache(tournamentId) {
       try {
             const key = `${POINTS_TABLE_KEY}:${tournamentId}`
 
-            // Check poison pill — if exists, bypass cache
-            const isStale = await redisClient.get(`stale:${key}`)
-            if (isStale) return null
+            // // Check poison pill — if exists, bypass cache
+            // const isStale = await redisClient.get(`stale:${key}`) // not needed for now since we are serving old data till worker recalculates the standings
+            // if (isStale) return null
 
             const data = await redisClient.get(key)
             return data ? JSON.parse(data) : null
