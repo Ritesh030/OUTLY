@@ -10,11 +10,16 @@ class TournamentRepository extends CrudRepository {
       }
 
       async getTeamsCount(tournamentId, transaction = null) {
-            const count = await db.TournamentTeams.count({
-                  where: { tournamentId: tournamentId }, lock: transaction?.LOCK?.UPDATE, transaction
-            })
+            try {
+                  const count = await db.TournamentTeams.count({
+                        where: { tournamentId: tournamentId }, lock: transaction?.LOCK?.UPDATE, transaction
+                  })
 
-            return count
+                  return count
+            } catch (error) {
+                  if (error instanceof AppError) throw error
+                  throw buildAppError(error, { service: 'tournament - repository', controller: 'getTeamsCount' })
+            }
       }
 
       async getTeams(tournamentId) {
@@ -29,7 +34,7 @@ class TournamentRepository extends CrudRepository {
                   })
             } catch (error) {
                   if (error instanceof AppError) throw error
-                  throw new Error(`Failed to fetch tournament teams: ${error.message}`)
+                  throw buildAppError(error, { service: 'tournament - repository', controller: 'getTeams' })
             }
       }
 
@@ -56,7 +61,37 @@ class TournamentRepository extends CrudRepository {
                   return tournament
             } catch (error) {
                   if (error instanceof AppError) throw error
-                  throw new Error(`Failed to fetch tournament tree: ${error.message}`)
+                  throw buildAppError(error, { service: 'tournament - repository', controller: 'getTournament' })
+            }
+      }
+
+      async getOpenTournament() {
+            try {
+                  const tournament = await db.Tournament.findAll({
+                        where: {
+                              status: 'OPEN'
+                        }
+                  })
+
+                  return tournament
+            } catch (error) {
+                  if (error instanceof AppError) throw error
+                  throw buildAppError(error, { service: 'tournament - repository', controller: 'getOpenTournament' })
+            }
+      }
+
+      async getOngoingTournament() {
+            try {
+                  const tournament = await db.Tournament.findAll({
+                        where: {
+                              status: 'ONGOING'
+                        }
+                  })
+
+                  return tournament
+            } catch (error) {
+                  if (error instanceof AppError) throw error
+                  throw buildAppError(error, { service: 'tournament - repository', controller: 'getOngoingTournamet' })
             }
       }
 
