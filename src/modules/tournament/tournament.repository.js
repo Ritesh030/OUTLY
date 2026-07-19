@@ -11,10 +11,26 @@ class TournamentRepository extends CrudRepository {
 
       async getTeamsCount(tournamentId, transaction = null) {
             const count = await db.TournamentTeams.count({
-                  where: { tournamentId: tournamentId },lock: transaction?.LOCK?.UPDATE, transaction
+                  where: { tournamentId: tournamentId }, lock: transaction?.LOCK?.UPDATE, transaction
             })
 
             return count
+      }
+
+      async getTeams(tournamentId) {
+            try {
+                  return await db.TournamentTeams.findAll({
+                        where: { tournamentId },
+                        include: [{
+                              model: db.Team,
+                              as: 'Team',
+                              attributes: ['id', 'name', 'ownerId']
+                        }]
+                  })
+            } catch (error) {
+                  if (error instanceof AppError) throw error
+                  throw new Error(`Failed to fetch tournament teams: ${error.message}`)
+            }
       }
 
       async getTournament(tournamentId, transaction = null) {
@@ -74,7 +90,7 @@ class TournamentRepository extends CrudRepository {
                   return await executeInTransaction(db.sequelize, async (transaction) => {
 
                         // 1. Validate tournament exists
-                        const tournament = await db.Tournament.findByPk(tournamentId, {lock: transaction.LOCK.UPDATE, transaction })
+                        const tournament = await db.Tournament.findByPk(tournamentId, { lock: transaction.LOCK.UPDATE, transaction })
                         if (!tournament) {
                               throw new AppError("Not Found", " ", "Tournament with this id does not exist.", StatusCodes.NOT_FOUND)
                         }

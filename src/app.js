@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser')
 const { PORT } = require('./config/server.config');
 const apiRouter = require('./routes');
 
-const { standingsWorker } = require('./modules/bullMQ/worker')
+const { standingsWorker, mailWorker } = require('./modules/bullMQ/worker')
 
 const app = express()
 

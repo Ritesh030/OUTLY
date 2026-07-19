@@ -14,3 +14,7 @@ const sendStatusMail = async (mailFrom, mailTo, mailSubject, mailBody) => {
             console.log("failed to send the status notification")
       }
 }
+
+module.exports = {
+      sendStatusMail
+}

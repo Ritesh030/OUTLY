@@ -14,5 +14,5 @@ module.exports = {
       POINTS_TABLE_KEY: process.env.POINTS_TABLE_KEY,
 
       EMAIL_ID: process.env.EMAIL_ID,
-      EMAIL_PASS = process.env.EMAIL_PASS
+      EMAIL_PASS: process.env.EMAIL_PASS
 }
