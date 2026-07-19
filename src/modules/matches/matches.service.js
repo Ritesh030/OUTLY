@@ -138,7 +138,21 @@ class MatchesService extends CrudService {
                   // // just clear the points table in redis
                   // clearPointsTableCache(data.tournamentId)
 
-                  
+                  // add a job in background worker to recalculate the standings and store in redis
+                  standingsQueue.add("Standings Recalculation and storing in redis",
+                        {
+                              tournamentId: match.tournamentId
+                        },
+                        {
+                              attempts: 3,
+                              backoff: {
+                                    type: "exponential",
+                                    delay: 1000
+                              }
+                        }
+                  ).catch(err =>
+                        console.error('Failed to queue standings recalculation:', err)
+                  )
 
                   // 2. Redis leaderboard — eventual consistency, fire and forget
                   if (data.resultType === 'WIN') {
@@ -201,7 +215,21 @@ class MatchesService extends CrudService {
                   // // just clear the points table in redis
                   // clearPointsTableCache(data.tournamentId)
 
-                  
+                  // add a job in background worker to recalculate the standings and store in redis
+                  standingsQueue.add("Standings Recalculation and storing in redis",
+                        {
+                              tournamentId: match.tournamentId
+                        },
+                        {
+                              attempts: 3,
+                              backoff: {
+                                    type: "exponential",
+                                    delay: 1000
+                              }
+                        }
+                  ).catch(err =>
+                        console.error('Failed to queue standings recalculation:', err)
+                  )
 
                   // 2. Redis leaderboard — eventual consistency, fire and forget
                   const previousWasWin = previousResultType === 'WIN' && previousWinnerId
