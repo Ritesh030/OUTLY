@@ -5,6 +5,7 @@ const { setPointsTableInRedis } = require('../../utils/redis/redisPointsTable')
 
 const matchesRepository = new MatchesRepository()
 
+// worker for standings calculation
 const standingsWorker = new Worker("standings",
       async (job) => {
             const tournamentId = job.data.tournamentId

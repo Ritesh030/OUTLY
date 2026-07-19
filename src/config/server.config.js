@@ -11,5 +11,8 @@ module.exports = {
       REFRESH_TOKEN_EXPIRY: process.env.REFRESH_TOKEN_EXPIRY,
 
       LEADERBOARD_KEY: process.env.LEADERBOARD_KEY,
-      POINTS_TABLE_KEY: process.env.POINTS_TABLE_KEY
+      POINTS_TABLE_KEY: process.env.POINTS_TABLE_KEY,
+
+      EMAIL_ID: process.env.EMAIL_ID,
+      EMAIL_PASS = process.env.EMAIL_PASS
 }
